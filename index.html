@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Cat Rig</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <div class="cat-container">
+
+        <svg viewBox="0 0 450 450" class="cat-svg">
+
+            <!-- BODY (larger + more natural) -->
+            <g id="body">
+                <ellipse cx="225" cy="340" rx="115" ry="150" class="body" />
+                <ellipse cx="185" cy="486" rx="20" ry="12" class="paw" />
+                <ellipse cx="265" cy="486" rx="20" ry="12" class="paw" />
+            </g>
+
+            <!-- TAIL (starts from body properly) -->
+            <g id="tail">
+                <path id="tail1" d="M300 430 Q400 280 420 250" />
+                <path id="tail2" d="M420 250 Q440 220 445 190" />
+                <path id="tail3" d="M445 190 Q450 160 448 140" />
+            </g>
+
+            <!-- NECK -->
+            <g id="neck">
+
+                <!-- HEAD (bigger) -->
+                <g id="head">
+
+                    <!-- EARS -->
+                    <g id="earL" class="ear">
+                        <polygon points="140,180 180,110 220,180" />
+                        <polygon class="inner" points="150,175 180,125 210,175" />
+                    </g>
+
+                    <g id="earR" class="ear">
+                        <polygon points="230,180 270,110 310,180" />
+                        <polygon class="inner" points="240,175 270,125 300,175" />
+                    </g>
+
+                    <!-- FACE -->
+                    <circle cx="220" cy="240" r="115" class="face" />
+
+                    <!-- EYES -->
+                    <g id="eyeL" class="eye">
+                        <ellipse cx="180" cy="230" rx="26" ry="28" />
+                        <ellipse id="pupilL" class="pupil" cx="180" cy="230" rx="8" ry="15" />
+                        <rect id="eyelidL" x="150" y="160" width="60" height="60" class="eyelid" />
+
+                    </g>
+
+                    <g id="eyeR" class="eye">
+                        <ellipse cx="270" cy="230" rx="26" ry="28" />
+                        <ellipse id="pupilR" class="pupil" cx="270" cy="230" rx="8" ry="15" />
+                        <rect id="eyelidR" x="238" y="160" width="60" height="60" class="eyelid" />
+                    </g>
+
+                    <!-- NOSE -->
+                    <ellipse id="nose" cx="225" cy="265" rx="10" ry="8" class="nose" />
+
+                    <!-- MOUTH -->
+                    <path id="mouth" d="M200 285 Q225 320 250 285" class="mouth" />
+
+                    <!-- WHISKERS -->
+                    <g id="whiskersL">
+                        <path id="wl1" d="M150 260 Q80 250 30 255" />
+                        <path id="wl2" d="M150 275 Q80 275 30 275" />
+                        <path id="wl3" d="M150 290 Q80 305 30 300" />
+                    </g>
+
+                    <g id="whiskersR">
+                        <path id="wr1" d="M300 260 Q370 250 420 255" />
+                        <path id="wr2" d="M300 275 Q370 275 420 275" />
+                        <path id="wr3" d="M300 290 Q370 305 420 300" />
+                    </g>
+
+                </g>
+            </g>
+
+        </svg>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

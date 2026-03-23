@@ -1,0 +1,91 @@
+body {
+  margin: 0;
+  background: radial-gradient(circle, #1a1a1a, #050505);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.cat-svg {
+  width: 700px;
+  height: 1000px;
+}
+
+/* Adjust transform origins to new geometry */
+#head { transform-origin: 225px 240px; }
+#neck { transform-origin: 225px 180px; }
+#earL { transform-origin: 180px 180px; }
+#earR { transform-origin: 270px 180px; }
+#body { transform-origin: 225px 320px; }
+
+/* BODY */
+.body {
+  fill: #2a2a2a;
+}
+.paw {
+  fill: #2a2a2a;
+}
+/* FACE */
+.face {
+  fill: #2f2f2f;
+}
+
+/* EARS */
+.ear polygon {
+  fill: #2f2f2f;
+}
+.ear .inner {
+  fill: #ffb6c1;
+}
+
+/* EYES */
+.eye ellipse {
+  fill: #f2f2f2;
+}
+
+.pupil {
+  fill: black;
+  transition: transform 0.1s linear;
+}
+
+/* NOSE */
+.nose {
+  fill: #ff9aa2;
+}
+
+/* MOUTH */
+.mouth {
+  stroke: #ddd;
+  stroke-width: 3;
+  fill: none;
+  transition: all 0.15s ease;
+}
+
+/* WHISKERS */
+#whiskersL path,
+#whiskersR path {
+  stroke: #ddd;
+  stroke-width: 2;
+  fill: none;
+  transition: all 0.15s ease;
+}
+
+
+/* TAIL */
+#tail path {
+  stroke: #2a2a2a;
+  stroke-width: 14; /* was 10 */
+  fill: none;
+  stroke-linecap: round;
+  transition: all 0.2s ease;
+  
+}
+#body {
+  transform-origin: 225px 300px;
+}
+.eyelid {
+  fill: #2f2f2f;
+  transition: transform 0.1s linear;
+}
+
