@@ -17,6 +17,7 @@ const mouth = document.getElementById("mouth");
 const tail1 = document.getElementById("tail1");
 const tail2 = document.getElementById("tail2");
 const tail3 = document.getElementById("tail3");
+let audio = new Audio('cat.wav');
 
 // ===== UTIL =====
 const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
@@ -152,7 +153,7 @@ setInterval(() => {
 // ===== CONTROL INPUT =====
 let control = { head: 0, x: 0, depth: 0 };
 
-const ws = new WebSocket(`ws://${location.host}/ws`);
+const ws = new WebSocket(`ws://192.168.1.184/ws`);
 
 function moodFromNumber(n) {
     switch (n) {
@@ -167,12 +168,21 @@ function moodFromNumber(n) {
 ws.onmessage = (e) => {
     const data = JSON.parse(e.data);
 
-    control.head = data.head;
-    control.x = data.x;
+    control.head = data.head*1.1;
+    control.x = data.x*4
+    
     control.depth = data.depth;
 
     if (data.mood !== undefined) {
         setMood(moodFromNumber(data.mood));
+    }
+
+    if (data.meow){
+        console.log("wiiwiiwii");
+        
+
+
+        audio.play();
     }
 };
 
@@ -180,6 +190,7 @@ ws.onmessage = (e) => {
 function animate() {
     target.head = control.head;
     target.x = control.x;
+    
     target.depth = control.depth;
 
     target.eyeX = control.head * 0.3;
