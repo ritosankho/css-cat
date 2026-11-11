@@ -17,7 +17,7 @@ const mouth = document.getElementById("mouth");
 const tail1 = document.getElementById("tail1");
 const tail2 = document.getElementById("tail2");
 const tail3 = document.getElementById("tail3");
-let audio = new Audio('cat.wav');
+const audio = new Audio('cat.wav');
 
 // ===== UTIL =====
 const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
@@ -153,44 +153,127 @@ setInterval(() => {
 // ===== CONTROL INPUT =====
 let control = { head: 0, x: 0, depth: 0 };
 
-const ws = new WebSocket(`ws://192.168.1.184/ws`);
+// Tuning: how far the cat moves at the screen edge
+const MAX_HEAD = 30;   // degrees of head tilt (before the 1.1 gain)
+const MAX_X = 40;      // horizontal head shift (SVG units)
+const MAX_DEPTH = 1;   // -1..1
+
+function meow() {
+    audio.currentTime = 0;
+    audio.play().catch(() => {});
+    // little happy blink
+    randomBlink();
+}
 
 function moodFromNumber(n) {
     switch (n) {
         case 0: return "idle";
         case 1: return "curious";
         case 2: return "happy";
+        case 3: return "angry";
         case 4: return "sleepy";
         default: return "idle";
     }
 }
 
-ws.onmessage = (e) => {
-    const data = JSON.parse(e.data);
+// ----- Pointer (mouse + touch + pen) -----
+const svgEl = document.querySelector(".cat-svg");
+const dragOnly = { value: false }; // set true if you want touch to only react while pressed
 
-    control.head = data.head*1.1;
-    control.x = data.x*4
-    
-    control.depth = data.depth;
+// Stop the browser from scrolling/zooming while dragging on the cat
+document.body.style.touchAction = "none";
+document.body.style.overflow = "hidden";
+// Make the SVG fit on small screens
+svgEl.style.maxWidth = "100vw";
+svgEl.style.maxHeight = "100vh";
 
-    if (data.mood !== undefined) {
-        setMood(moodFromNumber(data.mood));
+function setControlFromPointer(clientX, clientY) {
+    const r = svgEl.getBoundingClientRect();
+    // Normalise against the visible cat area: -1 (left/top) .. 1 (right/bottom)
+    const nx = clamp(((clientX - (r.left + r.width / 2)) / (r.width / 2)), -1, 1);
+    const ny = clamp(((clientY - (r.top + r.height * 0.3)) / (r.height * 0.5)), -1, 1);
+
+    control.head = nx * MAX_HEAD * 1.1;
+    control.x = nx * MAX_X;
+    control.depth = clamp(ny * MAX_DEPTH, -1, 1); // pointer down = lean in
+}
+
+function resetControl() {
+    control.head = 0;
+    control.x = 0;
+    control.depth = 0;
+}
+
+let pointerDown = false;
+
+window.addEventListener("pointermove", (e) => {
+    if (e.pointerType === "mouse" || pointerDown || !dragOnly.value) {
+        setControlFromPointer(e.clientX, e.clientY);
     }
+});
 
-    if (data.meow){
-        console.log("wiiwiiwii");
-        
+window.addEventListener("pointerdown", (e) => {
+    pointerDown = true;
+    setControlFromPointer(e.clientX, e.clientY);
+});
 
+window.addEventListener("pointerup", (e) => {
+    if (!pointerDown) return;
+    pointerDown = false;
+    // Tap/click = meow
+    meow();
+    // On touch there's no hover, so recentre when the finger lifts
+    if (e.pointerType !== "mouse") resetControl();
+});
 
-        audio.play();
-    }
-};
+window.addEventListener("pointercancel", () => {
+    pointerDown = false;
+    resetControl();
+});
+
+// Mouse leaves the window -> recentre
+document.addEventListener("mouseleave", resetControl);
+
+// ----- Keyboard (0-4 = force a mood, space = meow) -----
+window.addEventListener("keydown", (e) => {
+    if (e.key >= "0" && e.key <= "4") setMood(moodFromNumber(Number(e.key)));
+    if (e.code === "Space") { e.preventDefault(); meow(); }
+});
+
+// ----- Random mood every 3 seconds -----
+const MOOD_INTERVAL = 3000;
+
+function pickRandomMood() {
+    const names = Object.keys(moods).filter((m) => m !== currentMood); // always change
+    setMood(names[Math.floor(Math.random() * names.length)]);
+}
+
+setInterval(pickRandomMood, MOOD_INTERVAL);
+
+// ----- Optional: ESP32 joystick still works if reachable -----
+// Set to true to re-enable the websocket joystick alongside mouse/touch.
+const USE_WEBSOCKET = false;
+
+if (USE_WEBSOCKET) {
+    const ws = new WebSocket(`ws://192.168.1.184/ws`);
+
+    ws.onmessage = (e) => {
+        const data = JSON.parse(e.data);
+
+        control.head = data.head * 1.1;
+        control.x = data.x * 4;
+        control.depth = data.depth;
+
+        if (data.mood !== undefined) setMood(moodFromNumber(data.mood));
+        if (data.meow) meow();
+    };
+}
 
 // ===== MAIN LOOP =====
 function animate() {
     target.head = control.head;
     target.x = control.x;
-    
+
     target.depth = control.depth;
 
     target.eyeX = control.head * 0.3;
